@@ -2,7 +2,7 @@
     <h2>Booths in Building</h2>
     <ul class="list-group">
         <li class="list-group-item" th:each="booth : ${booths}">
-            <a th:href="@{/booth/{id}(id=${booth.id})}" th:text="${booth.name} + ' - ' + ${booth.izlagac.name}"></a>
+            <a th:href="@{/booth/{id}(id=${booth.id})}" th:text="${booth.name} + ' - ' + ${booth.exhibitor.name}"></a>
         </li>
     </ul>
 </div>

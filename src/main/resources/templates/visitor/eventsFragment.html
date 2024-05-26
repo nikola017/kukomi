@@ -4,8 +4,8 @@
             <div class="card-body">
                 <h5 class="card-title" th:text="${event.name}"></h5>
                 <p class="card-text">
-                    <strong>Exhibitor:</strong> <span th:text="${event.izlagac.name}"></span><br>
-                    <strong>Time:</strong> <span th:text="${event.zauzece.termin.time}"></span>
+                    <strong>Exhibitor:</strong> <span th:text="${event.exhibitor.name}"></span><br>
+                    <strong>Time:</strong> <span th:text="${event.booking.timeSlot.time}"></span>
                 </p>
                 <a th:href="@{'/events/' + ${event.id}}" class="btn btn-primary">Details</a>
             </div>
