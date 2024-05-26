@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        nav {
+            display: flex;
+            justify-content: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #28ff07;
+        }
+    </style>
+</head>
+<body>
+<div th:insert="~{visitor/header :: header}"></div>
+<div class="container">
+    <h1 id="eventName" th:text="${event.name}"></h1>
+    <p><strong>Exhibitor:</strong> <span id="exhibitor" th:text="${event.izlagac.name}"></span></p>
+    <p><strong>Time:</strong> <span id="time" th:text="${event.zauzece.termin.time}"></span></p>
+    <p><strong>Location:</strong> <span id="location" th:text="${event.zauzece.prostorDogadaj.name}"></span></p>
+    <p><strong>Hall:</strong> <span id="hall" th:text="${event.zauzece.prostorDogadaj.dvorana.name}"></span></p>
+    <p><strong>Details:</strong> <span id="details" th:text="${event.details}"></span></p>
+    <p><strong>Type:</strong> <span id="type" th:text="${event.eventType}"></span></p>
+    <div id="addToPlanBtn" style="display:none;">
+        <button onclick="addToPlan()" class="btn btn-primary">Add to Plan</button>
+    </div>
+    <div id="removeFromPlanBtn" style="display:none;">
+        <button onclick="removeFromPlan()" class="btn btn-danger">Remove from Plan</button>
+    </div>
+    <a href="/events" class="btn btn-primary">Back to Events</a>
+</div>
+<script>
+    // Function to check if the event is already in the plan
+    function isInPlan() {
+        var events = JSON.parse(localStorage.getItem('events')) || [];
+        var eventName = document.getElementById('eventName').textContent;
+        for (var i = 0; i < events.length; i++) {
+            if (events[i].name === eventName) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // Function to add an event to local storage
+    function addEventToLocal(event) {
+        // Check if local storage is supported
+        if (typeof(Storage) !== "undefined") {
+            // Retrieve existing events or initialize an empty array
+            var events = JSON.parse(localStorage.getItem('events')) || [];
+            // Add the new event
+            events.push(event);
+            // Save the updated events back to local storage
+            localStorage.setItem('events', JSON.stringify(events));
+        } else {
+            alert("Sorry, your browser does not support Web Storage. Events cannot be saved.");
+        }
+    }
+    // Function to remove an event from the plan
+    function removeEventFromLocal(eventName) {
+        // Retrieve events from local storage
+        var events = JSON.parse(localStorage.getItem('events')) || [];
+        // Filter out the event to be removed
+        var updatedEvents = events.filter(function(event) {
+            return event.name !== eventName;
+        });
+        // Save the updated events back to local storage
+        localStorage.setItem('events', JSON.stringify(updatedEvents));
+    }
+
+    // Function to handle adding an event to the plan
+    function addToPlan() {
+        // Assuming 'event' object is available here with event details
+        var event = {
+            name: document.getElementById('eventName').textContent,
+            exhibitor: document.getElementById('exhibitor').textContent,
+            time: document.getElementById('time').textContent,
+            location: document.getElementById('location').textContent,
+            hall: document.getElementById('hall').textContent,
+            details: document.getElementById('details').textContent,
+            type: document.getElementById('type').textContent
+        };
+        // Add the event to local storage
+        addEventToLocal(event);
+        toggleButtonVisibility();
+        // Alert the user that the event has been added to their plan
+        alert("Event has been added to your plan!");
+    }
+    // Function to remove the event from the plan
+    function removeFromPlan() {
+        var eventName = document.getElementById('eventName').textContent;
+        // Remove the event from local storage
+        removeEventFromLocal(eventName);
+        toggleButtonVisibility();
+        // Refresh the page
+        location.reload();
+    }
+
+    // Call the appropriate function based on whether the event is in the plan or not
+    function toggleButtonVisibility() {
+        if (isInPlan()) {
+            document.getElementById('addToPlanBtn').style.display = 'none';
+            document.getElementById('removeFromPlanBtn').style.display = 'block';
+        } else {
+            document.getElementById('addToPlanBtn').style.display = 'block';
+            document.getElementById('removeFromPlanBtn').style.display = 'none';
+        }
+    }
+
+    window.onload = function() {
+        toggleButtonVisibility();
+    };
+</script>
+</body>
+</html>

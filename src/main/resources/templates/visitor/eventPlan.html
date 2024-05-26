@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Event Plan</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        nav {
+            display: flex;
+            justify-content: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #28ff07;
+        }
+    </style>
+</head>
+<body>
+<div th:insert="~{visitor/header :: header}"></div>
+<div class="container">
+    <h1>My Event Plan</h1>
+    <div id="eventList"></div>
+    <a href="/events" class="btn btn-primary">Back to Events</a>
+</div>
+
+<script>
+    // Function to retrieve events from local storage and display them
+    function displayEventPlan() {
+        // Retrieve events from local storage
+        var events = JSON.parse(localStorage.getItem('events')) || [];
+
+        // Get the container element to display events
+        var eventListContainer = document.getElementById('eventList');
+
+        // Clear any existing content
+        eventListContainer.innerHTML = '';
+
+        // If there are no events in the plan, display a message
+        if (events.length === 0) {
+            eventListContainer.innerHTML = '<p>No events added to your plan yet.</p>';
+            return;
+        }
+
+        // Loop through each event and create HTML elements to display them
+        events.forEach(function(event, index) {
+            var eventHtml = '<div class="card mb-3">';
+            eventHtml += '<div class="card-body">';
+            eventHtml += '<h5 class="card-title">' + event.name + '</h5>';
+            eventHtml += '<p class="card-text"><strong>Exhibitor:</strong> ' + event.exhibitor + '</p>';
+            eventHtml += '<p class="card-text"><strong>Time:</strong> ' + event.time + '</p>';
+            eventHtml += '<p class="card-text"><strong>Location:</strong> ' + event.location + '</p>';
+            eventHtml += '<p class="card-text"><strong>Hall:</strong> ' + event.hall + '</p>';
+            eventHtml += '<p class="card-text"><strong>Details:</strong> ' + event.details + '</p>';
+            eventHtml += '<p class="card-text"><strong>Type:</strong> ' + event.type + '</p>';
+            eventHtml += '<button class="btn btn-danger" onclick="removeEvent(' + index + ')">Remove</button>';
+            eventHtml += '</div></div>';
+            eventListContainer.innerHTML += eventHtml;
+        });
+    }
+    // Function to remove an event from the plan
+    function removeEvent(index) {
+        // Retrieve events from local storage
+        var events = JSON.parse(localStorage.getItem('events')) || [];
+        // Remove the event at the specified index
+        events.splice(index, 1);
+        // Save the updated events back to local storage
+        localStorage.setItem('events', JSON.stringify(events));
+        // Update the displayed event plan
+        displayEventPlan();
+    }
+
+    // Call the displayEventPlan function when the page loads
+    window.onload = function() {
+        displayEventPlan();
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .ticket-list-item {
+            list-style: none;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .remove-btn {
+            margin-left: 10px;
+        }
+        .ticket-qrcode {
+            max-width: 100px;
+            margin-left: 10px;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #28ff07;
+        }
+
+    </style>
+</head>
+<div th:insert="~{visitor/header :: header}"></div>
+<body>
+<div class="container">
+    <h1 class="text-center mb-4">Add Ticket</h1>
+    <div class="mb-4">
+        <label for="ticketCode">Enter Ticket Code:</label>
+        <div class="input-group">
+            <input type="text" id="ticketCode" class="form-control" placeholder="Enter ticket code">
+            <div class="input-group-append">
+                <button onclick="addTicketByCode()" class="btn btn-primary">Add Ticket</button>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <h2 class="mb-2">Scan QR Code:</h2>
+    <div id="my-qr-reader" class="mb-4"></div>
+    <hr>
+    <h2 class="text-center mb-4">My Tickets</h2>
+    <ul id="ticketList" class="list-group"></ul>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+    var request = indexedDB.open("TicketDB", 1);
+    var db;
+
+    request.onerror = function(event) {
+        console.log("IndexedDB error: " + event.target.errorCode);
+    };
+
+    request.onsuccess = function(event) {
+        db = event.target.result;
+        displayTickets();
+    };
+
+    request.onupgradeneeded = function(event) {
+        db = event.target.result;
+        var objectStore = db.createObjectStore("tickets", { keyPath: "id", autoIncrement:true });
+    };
+
+    function displayTickets() {
+        var transaction = db.transaction(["tickets"], "readonly");
+        var objectStore = transaction.objectStore("tickets");
+        var ticketList = document.getElementById("ticketList");
+        ticketList.innerHTML = "";
+
+        objectStore.openCursor().onsuccess = function(event) {
+            var cursor = event.target.result;
+            if (cursor) {
+                var ticketItem = document.createElement("li");
+                ticketItem.textContent = cursor.value.code;
+                ticketItem.className = "list-group-item ticket-list-item";
+                var ticketQRDiv = document.createElement("div");
+                ticketQRDiv.className = "ticket-qrcode";
+                var ticketQR = new QRCode(ticketQRDiv);
+                ticketQR.makeCode(cursor.value.code);
+                ticketItem.appendChild(ticketQRDiv);
+                var removeButton = document.createElement("button");
+                removeButton.textContent = "Remove";
+                removeButton.className = "btn btn-danger btn-sm remove-btn";
+                removeButton.setAttribute("data-id", cursor.value.id);
+                removeButton.onclick = function() {
+                    removeTicket(parseInt(this.getAttribute("data-id")));
+                };
+                ticketItem.appendChild(removeButton);
+                ticketList.appendChild(ticketItem);
+                cursor.continue();
+            }
+        };
+    }
+
+    function addTicketByCode() {
+        var ticketCode = document.getElementById("ticketCode").value;
+        if (ticketCode.trim() !== "") {
+            var transaction = db.transaction(["tickets"], "readwrite");
+            var objectStore = transaction.objectStore("tickets");
+            var newTicket = { code: ticketCode };
+            var request = objectStore.add(newTicket);
+            request.onsuccess = function(event) {
+                displayTickets();
+                document.getElementById("ticketCode").value = "";
+            };
+        }
+    }
+
+    function addTicketByQRCode(ticketCode) {
+        if (ticketCode.trim() !== "") {
+            var transaction = db.transaction(["tickets"], "readwrite");
+            var objectStore = transaction.objectStore("tickets");
+            var newTicket = { code: ticketCode };
+            var request = objectStore.add(newTicket);
+            request.onsuccess = function(event) {
+                displayTickets();
+                document.getElementById("ticketCode").value = "";
+            };
+        }
+    }
+
+    function removeTicket(id) {
+        var transaction = db.transaction(["tickets"], "readwrite");
+        var objectStore = transaction.objectStore("tickets");
+        var request = objectStore.delete(id);
+        request.onsuccess = function(event) {
+            displayTickets();
+        };
+    }
+
+    function domReady(fn) {
+        if (
+            document.readyState === "complete" ||
+            document.readyState === "interactive"
+        ) {
+            setTimeout(fn, 1000);
+        } else {
+            document.addEventListener("DOMContentLoaded", fn);
+        }
+    }
+
+    domReady(function () {
+        function onScanSuccess(decodeText, decodeResult) {
+            alert("Your QR code is: " + decodeText);
+            addTicketByQRCode(decodeText); // Add ticket using the decoded QR code
+        }
+
+        let htmlscanner = new Html5QrcodeScanner(
+            "my-qr-reader",
+            { fps: 10, qrbox: 250 } // Corrected typo in options
+        );
+        htmlscanner.render(onScanSuccess);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convention Map</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            position: relative;
+        }
+        #convention-map {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 0; /* Ensure no default margin */
+            padding: 0; /* Ensure no default padding */
+        }
+        #highlight-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            margin: 0; /* Ensure no default margin */
+            padding: 0; /* Ensure no default padding */
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #28ff07;
+        }
+    </style>
+</head>
+<body>
+<div th:insert="~{visitor/header :: header}"></div>
+<div class="container">
+    <h1 class="mt-4">Convention Map</h1>
+    <div class="container">
+        <img id="convention-map" src="https://www.zv.hr/UserDocsImages/sajmovi/Korisne%20informacije/Plan%20sajma/planen.png" usemap="#conventionmap" class="img-fluid">
+        <canvas id="highlight-canvas"></canvas>
+        <map name="conventionmap">
+            <area shape="rect" coords="250,190,350,270" alt="Paviljon 5" href="#" onmouseover="highlightArea(this)" onmouseout="unhighlightArea(this)" onclick="loadBooths('1')">
+            <area shape="rect" coords="370,190,440,280" alt="Paviljon 6" href="#" onmouseover="highlightArea(this)" onmouseout="unhighlightArea(this)" onclick="loadBooths('2')">
+            <area shape="rect" coords="370,285,480,335" alt="Paviljon 7" href="#" onmouseover="highlightArea(this)" onmouseout="unhighlightArea(this)" onclick="loadBooths('3')">
+            <area shape="rect" coords="450,200,510,240" alt="Paviljon 8" href="#" onmouseover="highlightArea(this)" onmouseout="unhighlightArea(this)" onclick="loadBooths('4')">
+            <area shape="rect" coords="510,200,560,245" alt="Paviljon 8a" href="#" onmouseover="highlightArea(this)" onmouseout="unhighlightArea(this)" onclick="loadBooths('5')">
+            <area shape="rect" coords="560,200,600,245" alt="Paviljon 9" href="#" onmouseover="highlightArea(this)" onmouseout="unhighlightArea(this)" onclick="loadBooths('6')">
+            <area shape="rect" coords="600,200,650,245" alt="Paviljon 11a" href="#" onmouseover="highlightArea(this)" onmouseout="unhighlightArea(this)" onclick="loadBooths('7')">
+            <area shape="rect" coords="650,200,700,245" alt="Paviljon 11d" href="#" onmouseover="highlightArea(this)" onmouseout="unhighlightArea(this)" onclick="loadBooths('8')">
+        </map>
+    </div>
+    <div id="booths-list" class="mt-4">
+        <!-- Booths will be loaded here -->
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script>
+    const image = document.getElementById('convention-map');
+    const canvas = document.getElementById('highlight-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        console.log(image.clientWidth)
+        console.log(image.clientHeight)
+        canvas.width = image.clientWidth;
+        canvas.height = image.clientHeight;
+        canvas.style.width = image.clientWidth + 'px';
+        canvas.style.height = image.clientHeight + 'px';
+        console.log(canvas.width)
+        console.log(canvas.height)
+    }
+
+    // Adjust the canvas size to match the image size
+    image.onload = function() {
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+    }
+
+    function highlightArea(area) {
+        const coords = area.coords.split(',').map(Number);
+        const rect = image.getBoundingClientRect();
+        const scaleX = image.naturalWidth / rect.width;
+        const scaleY = image.naturalHeight / rect.height;
+
+        const x1 = coords[0] - scaleX;
+        const y1 = coords[1] - scaleY;
+        const x2 = coords[2] - scaleX;
+        const y2 = coords[3] - scaleY;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Highlight color
+        ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+    }
+
+    function unhighlightArea(area) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function loadBooths(hall) {
+        fetch('/booths?hall=' + hall)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('booths-list').innerHTML = html;
+            });
+    }
+</script>
+</body>
+</html>

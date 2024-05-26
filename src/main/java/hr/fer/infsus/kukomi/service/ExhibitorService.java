@@ -1,6 +1,10 @@
 package hr.fer.infsus.kukomi.service;
 
+import hr.fer.infsus.kukomi.entity.Booth;
+import hr.fer.infsus.kukomi.entity.Event;
 import hr.fer.infsus.kukomi.entity.Exhibitor;
+import hr.fer.infsus.kukomi.repository.BoothRepository;
+import hr.fer.infsus.kukomi.repository.EventRepository;
 import hr.fer.infsus.kukomi.repository.ExhibitorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,9 +16,40 @@ import java.util.Optional;
 public class ExhibitorService {
     @Autowired
     private ExhibitorRepository exhibitorRepository;
+    @Autowired
+    private BoothRepository boothRepository;
+    @Autowired
+    private EventRepository eventRepository;
 
     public List<Exhibitor> findAllExhibitors() {
         return exhibitorRepository.findAll();
+    }
+
+    public List<Exhibitor> getAllIzlagaci() {
+        return exhibitorRepository.findAll();
+    }
+
+    public Exhibitor getIzlagacById(Integer id) {
+        return exhibitorRepository.findById(id).orElse(null);
+    }
+
+    public List<Booth> getStandsByIzlagacId(Integer izlagacID) {
+        return boothRepository.findByExhibitorId(izlagacID);
+    }
+
+    public List<Event> getDogadajiByIzlagacId(Integer izlagacID) {
+        return eventRepository.findByExhibitorId(izlagacID);
+    }
+    public void saveIzlagac(Exhibitor exhibitor) {
+        exhibitorRepository.save(exhibitor);
+    }
+
+    public void saveStand(Booth booth) {
+        boothRepository.save(booth);
+    }
+
+    public void saveDogadaj(Event event) {
+        eventRepository.save(event);
     }
 
     public Exhibitor saveExhibitor(Exhibitor exhibitor) {

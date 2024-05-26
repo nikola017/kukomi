@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Exhibitor Details</title>
+</head>
+<body>
+<h1>Exhibitor Details</h1>
+<div>
+  <h2 th:text="${exhibitor.imeIzlagaca}">Name</h2>
+  <p>Company: <span th:text="${exhibitor.kompanija}">Company</span></p>
+  <p>Email: <span th:text="${exhibitor.email}">Email</span></p>
+  <p>Phone: <span th:text="${exhibitor.telefon}">Phone</span></p>
+  <p>ID: <span th:text="${exhibitor.izlagacID}">ID</span></p>
+</div>
+
+<h3>Stands</h3>
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Details</th>
+    <th>Action</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="booth : ${booths}">
+    <form th:action="@{/booths/update}" th:object="${booth}" method="post">
+      <td><input type="text" th:field="*{imeStanda}" /></td>
+      <td><input type="text" th:field="*{detaljiStanda}" /></td>
+      <td>
+        <input type="hidden" th:field="*{standID}" />
+        <input type="hidden" th:field="*{exhibitor.izlagacID}" />
+        <input type="hidden" th:field="*{exhibitor.izlagacID}" />
+        <button type="submit">Save</button>
+      </td>
+    </form>
+  </tr>
+  </tbody>
+</table>
+
+<h3>Events</h3>
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Details</th>
+    <th>Action</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="event : ${dogadaji}">
+    <form th:action="@{/dogadaji/update}" th:object="${event}" method="post">
+      <td><input type="text" th:field="*{imeDogadaja}" /></td>
+      <td><input type="text" th:field="*{detaljiDogadaja}" /></td>
+      <td>
+        <input type="hidden" th:field="*{dogadjajId}" />
+        <input type="hidden" th:field="*{exhibitor.izlagacID}" />
+        <button type="submit">Save</button>
+      </td>
+    </form>
+  </tr>
+  </tbody>
+</table>
+
+<a href="/izlagaci">Back to Exhibitors</a>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Exhibitors</title>
+</head>
+<body>
+<h1>Exhibitors</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Company</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="exhibitor : ${izlagaci}">
+        <td>
+            <a th:href="@{/izlagaci/{id}(id=${exhibitor.izlagacID})}" th:text="${exhibitor.imeIzlagaca}">Izlagac Name</a>
+        </td>
+        <td th:text="${exhibitor.kompanija}">Company</td>
+        <td th:text="${exhibitor.email}">Email</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

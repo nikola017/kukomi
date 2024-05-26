@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booth Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        nav {
+            display: flex;
+            justify-content: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #28ff07;
+        }
+    </style>
+</head>
+<body>
+<div th:insert="~{visitor/header :: header}"></div>
+<div class="container">
+    <h1 th:text="${booth.name}"></h1>
+    <p><strong>Exhibitor:</strong> <span th:text="${exhibitor.name}"></span></p>
+    <p><strong>Details:</strong> <span th:text="${booth.details}"></span></p>
+    <p><strong>Stand Space:</strong> <span th:text="${boothSpace.name}"></span></p>
+    <a href="/" class="btn btn-primary">Back to Map</a>
+</div>
+</body>
+</html>
