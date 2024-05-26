@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Prijavnica</title>
+    <script>
+        function showOrHideCompanyField() {
+            var selector = document.getElementById('exhibitorType');
+            var value = selector.value;
+            var companyField = document.getElementById('companyField');
+            if (value === 'COMPANY') {
+                companyField.style.display = 'block';
+            } else {
+                companyField.style.display = 'none';
+                document.getElementById('company').value = ''; // Opcionalno očisti vrijednost
+            }
+        }
+
+        function showOptions(choice) {
+            var eventOptions = document.getElementById('eventOptions');
+            var boothOptions = document.getElementById('boothOptions');
+            if (choice === 'EVENT') {
+                eventOptions.style.display = 'block';
+                boothOptions.style.display = 'none';
+            } else if (choice === 'STAND') {
+                eventOptions.style.display = 'none';
+                boothOptions.style.display = 'block';
+            } else {
+                eventOptions.style.display = 'none';
+                boothOptions.style.display = 'none';
+            }
+        }
+
+        function validateForm(event) {
+            var name = document.getElementById('name').value;
+            var email = document.getElementById('email').value;
+            var phone = document.getElementById('phone').value;
+            var exhibitorType = document.getElementById('exhibitorType').value;
+            var company = document.getElementById('company').value;
+            var choice = document.getElementById('choice').value;
+            var boothName = document.getElementById('boothName').value;
+            var eventName = document.getElementById('eventName').value;
+            var isValid = true;
+            var errorMessage = "";
+
+            if (name.trim() === "") {
+                isValid = false;
+                errorMessage += "Ime izlagača je obavezno.\n";
+            }
+            if (email.trim() === "") {
+                isValid = false;
+                errorMessage += "Email izlagača je obavezan.\n";
+            }
+            if (!validateEmail(email)) {
+                isValid = false;
+                errorMessage += "Email nije ispravan.\n";
+            }
+            if (phone.trim() === "" || !validatePhone(phone)) {
+                isValid = false;
+                errorMessage += "Telefon je obavezan i mora biti ispravan.\n";
+            }
+            if (exhibitorType === "COMPANY" && company.trim() === "") {
+                isValid = false;
+                errorMessage += "Ime kompanije je obavezno za kompanije.\n";
+            }
+            if (choice === "") {
+                isValid = false;
+                errorMessage += "Odabir je obavezan.\n";
+            } else if (choice === "EVENT") {
+                var eventSpace = document.getElementById('eventSpace').value;
+                var timeSlot = document.getElementById('timeSlot').value;
+                var eventDetails = document.getElementById('eventDetails').value;
+                if (eventName.trim() === "") {
+                    isValid = false;
+                    errorMessage += "Naziv događaja je obavezan.\n";
+                }
+                if (eventSpace === "") {
+                    isValid = false;
+                    errorMessage += "Lokacija događaja je obavezna.\n";
+                }
+                if (timeSlot === "") {
+                    isValid = false;
+                    errorMessage += "Vrijeme događaja je obavezno.\n";
+                }
+                if (eventDetails.trim() === "") {
+                    isValid = false;
+                    errorMessage += "Detalji događaja su obavezni.\n";
+                }
+            } else if (choice === "STAND") {
+                var boothSpace = document.getElementById('boothSpace').value;
+                var boothDetails = document.getElementById('boothDetails').value;
+                if (boothName.trim() === "") {
+                    isValid = false;
+                    errorMessage += "Naziv štanda je obavezan.\n";
+                }
+                if (boothSpace === "") {
+                    isValid = false;
+                    errorMessage += "Lokacija štanda je obavezna.\n";
+                }
+                if (boothDetails.trim() === "") {
+                    isValid = false;
+                    errorMessage += "Detalji štanda su obavezni.\n";
+                }
+            }
+
+            if (!isValid) {
+                alert(errorMessage);
+                event.preventDefault();
+            }
+        }
+
+        function validateEmail(email) {
+            var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validatePhone(phone) {
+            var re = /^[0-9\s\-]+$/;
+            return re.test(phone);
+        }
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            showOrHideCompanyField(); // Call this on page load
+            document.getElementById('exhibitorType').addEventListener('change', showOrHideCompanyField);
+            document.getElementById('choice').addEventListener('change', function() {
+                showOptions(this.value);
+            });
+            document.querySelector('form').addEventListener('submit', validateForm);
+        });
+    </script>
+</head>
+<body>
+<h2>Prijavnica</h2>
+<form action="#" th:action="@{/apply}" th:object="${applicationForm}" method="post">
+    <div>
+        <label for="name">Ime izlagača:</label>
+        <input type="text" id="name" th:field="*{exhibitor.name}" required />
+    </div>
+    <div>
+        <label for="email">Email izlagača:</label>
+        <input type="email" id="email" th:field="*{exhibitor.email}" required />
+    </div>
+    <div>
+        <label for="phone">Telefon izlagača:</label>
+        <input type="text" id="phone" th:field="*{exhibitor.phone}" required />
+    </div>
+    <div>
+        <label for="exhibitorType">Vrsta izlagača:</label>
+        <select id="exhibitorType">
+            <option value="ARTIST">Umjetnik</option>
+            <option value="COMPANY">Kompanija</option>
+        </select>
+    </div>
+    <div id="companyField" style="display:none;">
+        <label for="company">Ime kompanije:</label>
+        <input type="text" id="company" th:field="*{exhibitor.company}" />
+    </div>
+    <div>
+        <label for="choice">Odabir:</label>
+        <select id="choice" required>
+            <option value="">Odaberi opciju...</option>
+            <option value="STAND">Štand</option>
+            <option value="EVENT">Događaj</option>
+        </select>
+    </div>
+
+    <div id="eventOptions" style="display:none;">
+        <label for="eventName">Naziv događaja:</label>
+        <input type="text" id="eventName" th:field="*{event.name}" />
+        <label for="eventSpace">Lokacija događaja:</label>
+        <select id="eventSpace" th:field="*{eventSpace.id}">
+            <option th:each="space : ${eventSpaces}" th:value="${space.id}" th:text="${space.name}">Lokacija</option>
+        </select>
+        <label for="timeSlot">Vrijeme:</label>
+        <select id="timeSlot" th:field="*{timeSlot.id}">
+            <option th:each="slot : ${timeSlots}" th:value="${slot.id}" th:text="${slot.time}">Vrijeme</option>
+        </select>
+        <label for="eventDetails">Detalji događaja:</label>
+        <textarea id="eventDetails" th:field="*{event.details}"></textarea>
+    </div>
+
+    <div id="boothOptions" style="display:none;">
+        <label for="boothName">Naziv štanda:</label>
+        <input type="text" id="boothName" th:field="*{booth.name}" />
+        <label for="boothSpace">Lokacija štanda:</label>
+        <select id="boothSpace" th:field="*{boothSpace.id}">
+            <option th:each="space : ${boothSpaces}" th:value="${space.id}" th:text="${space.name}">Lokacija</option>
+        </select>
+        <label for="boothDetails">Detalji štanda:</label>
+        <textarea id="boothDetails" th:field="*{booth.details}"></textarea>
+    </div>
+
+    <button type="submit">Podnesi</button>
+</form>
+</body>
+</html>

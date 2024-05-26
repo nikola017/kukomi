@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        .approved {
+            background-color: green;
+            color: white;
+        }
+        .rejected {
+            background-color: red;
+            color: white;
+        }
+        .approved-not-paid {
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+<h2>Admin Dashboard</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Ime Izlagača</th>
+        <th>Štand/Događaj</th>
+        <th>Dan</th>
+        <th>Termin</th>
+        <th>Status</th>
+        <th>Plaćeno</th>
+        <th>Akcije</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="form : ${applicationForms}"
+        th:classappend="${form.approved == 1 && form.paid == 1 ? 'approved' : form.approved == -1 ? 'rejected' : form.approved == 1 && form.paid == 0 ? 'approved-not-paid' : ''}">
+        <td th:text="${form.id}">1</td>
+        <td th:text="${form.exhibitor.name}">Izlagač</td>
+        <td th:text="${form.booth != null ? form.booth.name : form.event.name}">Štand/Događaj</td>
+        <td th:text="${form.event != null ? form.event.booking.day : ''}">Dan</td>
+        <td th:text="${form.timeSlot != null ? form.timeSlot.time : ''}">Termin</td>
+        <td th:text="${form.approved == 1 ? 'Odobrena' : form.approved == -1 ? 'Odbijena' : 'Nije odlučeno'}">Status</td>
+        <td th:text="${form.paid == 1 ? 'Da' : 'Ne'}">Plaćeno</td>
+        <td>
+            <form th:action="@{/admin/dashboard/approve}" method="post" style="display: inline;" th:if="${!(form.approved == 1 && form.paid == 1)}">
+                <input type="hidden" name="id" th:value="${form.id}"/>
+                <button type="submit">Prihvati</button>
+            </form>
+            <form th:action="@{/admin/dashboard/reject}" method="post" style="display: inline;" th:if="${!(form.approved == 1 && form.paid == 1)}">
+                <input type="hidden" name="id" th:value="${form.id}"/>
+                <button type="submit">Odbij</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
