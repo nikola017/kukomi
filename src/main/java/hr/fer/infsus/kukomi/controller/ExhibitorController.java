@@ -29,25 +29,25 @@ public class ExhibitorController {
     public String getIzlagacDetail(@PathVariable Integer id, Model model) {
         Exhibitor exhibitor = exhibitorService.getIzlagacById(id);
         List<Booth> booths = exhibitorService.getStandsByIzlagacId(id);
-        List<Event> dogadaji = exhibitorService.getDogadajiByIzlagacId(id);
+        List<Event> events = exhibitorService.getDogadajiByIzlagacId(id);
 
-        model.addAttribute("izlagac", exhibitor);
-        model.addAttribute("stands", booths);
-        model.addAttribute("dogadaji", dogadaji);
+        model.addAttribute("exhibitor", exhibitor);
+        model.addAttribute("booths", booths);
+        model.addAttribute("events", events);
 
         return "admin/izlagac-detail";
     }
 
-    @PostMapping("/izlagaci/update")
-    public String updateIzlagac(Exhibitor exhibitor) {
-        exhibitorService.saveIzlagac(exhibitor);
-        return "redirect:/izlagaci/" + exhibitor.getId();
+    @PostMapping("/izlagaciupdate")
+    public String updateIzlagac(String boothName, String boothDetails, Integer boothId) {
+        exhibitorService.saveIzlagac(boothName,boothDetails,boothId);
+        return "redirect:/izlagaci/" + boothId;
     }
 
-    @PostMapping("/stands/update")
-    public String updateStand(Booth booth) {
-        exhibitorService.saveStand(booth);
-        return "redirect:/izlagaci/" + booth.getExhibitor().getId();
+    @PostMapping("/updateBooth")
+    public String updateStand(String boothName, String boothDetails, Integer boothId) {
+        exhibitorService.saveStand(boothName, boothDetails, boothId);
+        return "redirect:/izlagaci/" + boothId;
     }
 
     @PostMapping("/dogadaji/update")

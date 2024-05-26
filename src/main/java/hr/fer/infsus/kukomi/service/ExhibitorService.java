@@ -8,6 +8,7 @@ import hr.fer.infsus.kukomi.repository.EventRepository;
 import hr.fer.infsus.kukomi.repository.ExhibitorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +41,17 @@ public class ExhibitorService {
     public List<Event> getDogadajiByIzlagacId(Integer izlagacID) {
         return eventRepository.findByExhibitorId(izlagacID);
     }
-    public void saveIzlagac(Exhibitor exhibitor) {
-        exhibitorRepository.save(exhibitor);
+
+    @Transactional
+    public void saveIzlagac(String name, String details, Integer id) {
+        eventRepository.updateNameAndDetailsById(id, name, details);
     }
 
-    public void saveStand(Booth booth) {
-        boothRepository.save(booth);
+
+    @Transactional
+    public void saveStand(String name, String details, Integer id) {
+
+        boothRepository.updateNameAndDetailsById(name,details,id);
     }
 
     public void saveDogadaj(Event event) {

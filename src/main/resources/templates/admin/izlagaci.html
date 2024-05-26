@@ -16,9 +16,9 @@
     <tbody>
     <tr th:each="exhibitor : ${izlagaci}">
         <td>
-            <a th:href="@{/izlagaci/{id}(id=${exhibitor.izlagacID})}" th:text="${exhibitor.imeIzlagaca}">Izlagac Name</a>
+            <a th:href="@{/izlagaci/{id}(id=${exhibitor.id})}" th:text="${exhibitor.name}">Izlagac Name</a>
         </td>
-        <td th:text="${exhibitor.kompanija}">Company</td>
+        <td th:text="${exhibitor.company}">Company</td>
         <td th:text="${exhibitor.email}">Email</td>
     </tr>
     </tbody>

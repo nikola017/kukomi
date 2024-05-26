@@ -2,6 +2,7 @@ package hr.fer.infsus.kukomi.repository;
 
 import hr.fer.infsus.kukomi.entity.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -21,4 +22,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findByDate(@Param("date") LocalDate date);
 
     List<Event> findByExhibitorId(Integer izlagacID);
+
+    @Modifying
+    @Query("UPDATE Event e SET e.name = :name, e.details = :details WHERE e.id = :eventId")
+    void updateNameAndDetailsById(@Param("eventId") Integer eventId, @Param("name") String name, @Param("details") String details);
 }
