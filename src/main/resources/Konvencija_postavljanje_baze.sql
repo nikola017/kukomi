@@ -96,5 +96,5 @@ CREATE TABLE Prijavnica
   FOREIGN KEY (StandID) REFERENCES Stand(StandID),
   FOREIGN KEY (ProstorStandID) REFERENCES ProstorStand(ProstorStandID),
   FOREIGN KEY (DogadajID) REFERENCES Događaj(DogadajID),
-  FOREIGN KEY (TerminID) REFERENCES Termin(TerminID)
+  FOREIGN KEY (ZauzećeID) REFERENCES Zauzece(ZauzećeID)
 );
